@@ -78,11 +78,7 @@ function renderTable(data, page = 1, perPage = 50) {
     }
 }
 
-// Toggle save/export buttons and email field visibility
-function toggleButtons(show) {
-    const buttons = ['saveFormattedBtn', 'saveMinifiedBtn', 'exportCsvBtn'];
-    buttons.forEach(id => document.getElementById(id).style.display = show ? 'inline-block' : 'none');
-}
+
 
 // Convert JSON to table
 function convertToTable() {
@@ -95,11 +91,11 @@ function convertToTable() {
         window.originalStructure = data;
         renderTable(window.currentData);
         errorDiv.textContent = '';
-        toggleButtons(true);
+        
     } catch (error) {
         errorDiv.textContent = `Error at position ${error.message.match(/\d+/) || 'unknown'}: ${error.message}`;
         document.getElementById('tableContainer').innerHTML = '';
-        toggleButtons(false);
+        
     }
 }
 
@@ -173,72 +169,7 @@ function setNestedValue(obj, path, value) {
         current[lastPart] = value;
     }
 }
-
-// Export to CSV with payment check
-function exportToCSV() {
-    const errorDiv = document.getElementById('error');
-    const premiumSection = document.getElementById('premiumSection');
-    const kofiLink = document.getElementById('kofiLink');
-    const email = document.getElementById('userEmail').value;
-
-    if (!window.currentData) {
-        errorDiv.textContent = 'No data to export!';
-        return;
-    }
-
-    premiumSection.style.display = 'block';
-
-    if (!email) {
-        errorDiv.textContent = 'Please enter your email to proceed!';
-        kofiLink.style.display = 'none';
-        return;
-    }
-
-    // Set Ko-fi link with email and return URL
-    kofiLink.href = `https://ko-fi.com/s/453f86f84a?email=${encodeURIComponent(email)}&return_url=${encodeURIComponent(window.location.origin + '/success.php?email=' + encodeURIComponent(email))}`;
-    kofiLink.style.display = 'inline';
-
-    // Check payment status via fetch
-    fetch(`/check_payment.php?email=${encodeURIComponent(email)}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.paid) {
-                // Flatten nested objects for CSV export
-                const flatten = (obj, prefix = '') => {
-                    const result = {};
-                    for (const [key, value] of Object.entries(obj)) {
-                        const newKey = prefix ? `${prefix}.${key}` : key;
-                        if (value && typeof value === 'object' && !Array.isArray(value)) {
-                            Object.assign(result, flatten(value, newKey));
-                        } else {
-                            result[newKey] = value;
-                        }
-                    }
-                    return result;
-                };
-                const flatData = window.currentData.map(item => flatten(item));
-                const columns = [...new Set(flatData.flatMap(Object.keys))];
-                const csv = [columns.join(',')];
-                flatData.forEach(obj => csv.push(columns.map(col => `"${(obj[col] || '').toString().replace(/"/g, '""')}"`).join(',')));
-                
-                // Create and download CSV file
-                const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'table.csv';
-                a.click();
-                errorDiv.textContent = '';
-                premiumSection.style.display = 'none';
-            } else if (data.status === 'pending') {
-                errorDiv.innerHTML = 'Payment pending. Please complete your purchase on Ko-fi and return here. <br>Issues? Email <a href="mailto:support@bitlager.de">support@bitlager.de</a>.';
-            } else {
-                errorDiv.textContent = 'Email not registered. Please complete payment via Ko-fi!';
-            }
-        })
-        .catch(error => errorDiv.textContent = 'Error: ' + error.message);
-}
-
+ 
 // Filter table
 function filterTable() {
     const filter = document.getElementById('filterInput').value.toLowerCase().trim();
@@ -339,7 +270,7 @@ Offline JSON2Table editor tool:
 - converts JSON to editable table 
 - edit table and save as formatted or minified JSON`;
 
-    toggleButtons(false);
+    
     setupDragAndDrop();
 
     // Theme initialization
@@ -354,18 +285,14 @@ Offline JSON2Table editor tool:
         if (!jsonInput.value) {
             document.getElementById('tableContainer').innerHTML = '';
             document.getElementById('pagination').innerHTML = '';
-            toggleButtons(false);
+           
             document.getElementById('error').textContent = '';
             window.currentData = null;
         }
     });
 
     document.getElementById('convertBtn').addEventListener('click', convertToTable);
-    document.getElementById('saveFormattedBtn').addEventListener('click', () => saveChanges(true));
-    document.getElementById('saveMinifiedBtn').addEventListener('click', () => saveChanges(false));
-    document.getElementById('exportCsvBtn').addEventListener('click', exportToCSV);
-    document.getElementById('toggleThemeBtn').addEventListener('click', toggleTheme);
-
+    
     const filterInput = document.getElementById('filterInput');
     if (filterInput) {
         filterInput.addEventListener('input', filterTable);
@@ -482,19 +409,5 @@ Offline JSON2Table editor tool:
     });
 });
 
-// Show Ko-fi link only when email is entered
-document.getElementById('userEmail').addEventListener('input', () => {
-    const email = document.getElementById('userEmail').value;
-    document.getElementById('kofiLink').style.display = email ? 'inline' : 'none';
-    document.getElementById('error').textContent = '';
-});
 
-// Auto-check payment status on page load if email is in URL
-document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const email = urlParams.get('email');
-    if (email) {
-        document.getElementById('userEmail').value = email;
-        exportToCSV(); // Trigger payment check automatically
-    }
-});
+ 
