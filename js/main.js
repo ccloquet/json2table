@@ -300,12 +300,7 @@ Offline JSON2Table editor tool:
         console.error('Filter input element not found!');
     }
 
-    // Reset BMC link and error on email input
-    document.getElementById('userEmail').addEventListener('input', () => {
-        document.getElementById('error').textContent = '';
-        document.getElementById('bmcLink').style.display = 'none';
-    });
-
+ 
     document.getElementById('sampleJsonBtn').addEventListener('click', () => {
         const sampleJson = [
             {
