@@ -170,43 +170,7 @@ function setNestedValue(obj, path, value) {
     }
 }
  
-// Filter table
-function filterTable() {
-    const filter = document.getElementById('filterInput').value.toLowerCase().trim();
-    const cells = document.querySelectorAll('.table-wrapper td');
-    
-    if (filter === '') {
-        cells.forEach(cell => {
-            cell.classList.remove('filtered', 'highlight');
-        });
-        return;
-    }
 
-    cells.forEach(cell => {
-        const text = cell.textContent.toLowerCase();
-        if (text.includes(filter)) {
-            cell.classList.remove('filtered');
-            cell.classList.add('highlight');
-        } else {
-            cell.classList.add('filtered');
-            cell.classList.remove('highlight');
-        }
-    });
-
-    // Filter nested tables
-    const nestedCells = document.querySelectorAll('.nested td');
-    nestedCells.forEach(cell => {
-        const text = cell.textContent.toLowerCase();
-        if (text.includes(filter)) {
-            cell.classList.remove('filtered');
-            cell.classList.add('highlight');
-            cell.closest('.table-wrapper').style.display = '';
-        } else {
-            cell.classList.add('filtered');
-            cell.classList.remove('highlight');
-        }
-    });
-}
 
 
 
