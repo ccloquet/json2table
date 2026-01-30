@@ -208,21 +208,7 @@ function filterTable() {
     });
 }
 
-// Toggle Theme
-function toggleTheme() {
-    const html = document.documentElement;
-    if (html.classList.contains('light-mode')) {
-        html.classList.remove('light-mode');
-        html.classList.add('dark-mode');
-        document.getElementById('toggleThemeBtn').textContent = '☀️';
-        localStorage.setItem('theme', 'dark');
-    } else {
-        html.classList.remove('dark-mode');
-        html.classList.add('light-mode');
-        document.getElementById('toggleThemeBtn').textContent = '🌙';
-        localStorage.setItem('theme', 'light');
-    }
-}
+
 
 // Drag-and-Drop handling
 function setupDragAndDrop() {
@@ -273,15 +259,7 @@ Offline JSON2Table editor tool:
     
     setupDragAndDrop();
 
-    // Theme initialization
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        document.documentElement.classList.remove('light-mode');
-        document.documentElement.classList.add('dark-mode');
-        document.getElementById('toggleThemeBtn').textContent = '☀️';
-    }
-
-    jsonInput.addEventListener('input', () => {
+      jsonInput.addEventListener('input', () => {
         if (!jsonInput.value) {
             document.getElementById('tableContainer').innerHTML = '';
             document.getElementById('pagination').innerHTML = '';
